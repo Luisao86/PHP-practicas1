@@ -7,11 +7,26 @@ $txtNombre=(isset($_POST['txtNombre']))?($_POST['txtNombre']):"";
 $txtImagen=(isset($_FILES['txtImagen']['name']))?($_FILES['txtImagen']['name']):"";
 $accion=(isset($_POST['accion']))?($_POST['accion']):"";
 
-echo $txtid."<br/>";
-echo $txtNombre."<br/>";
-echo $txtImagen."<br/>";
-echo $accion."<br/>";
+include("../config/db.php");
 
+
+
+switch ($accion) {
+    case 'Agregar':
+        $sentenciSQL= $conexion->prepare("INSERT INTO productos (nombre, imagen) VALUES (:nombre,:imagen);");
+        $sentenciSQL->bindParam(':nombre',$txtNombre);
+        $sentenciSQL->bindParam(':imagen',$txtImagen);
+        $sentenciSQL->execute();
+        break;
+
+    case 'Modificar':
+        echo "Presionado boton modificar";
+        break;
+
+    case 'Cancelar':
+        echo "Presionado boton cancelar";
+        break;
+}
 
 ?>
 
@@ -42,8 +57,8 @@ echo $accion."<br/>";
             </div>
 
             <div class="btn-group" role="group" aria-label="">
-                <button type="submit" name="accion" value="Agregar" class="btn btn-success">Agregar producto</button>
-                <button type="submit" name="accion" value="Modificar" class="btn btn-warning">Modificar producto</button>
+                <button type="submit" name="accion" value="Agregar" class="btn btn-success">Agregar</button>
+                <button type="submit" name="accion" value="Modificar" class="btn btn-warning">Modificar</button>
                 <button type="submit" name="accion" value="Cancelar" class="btn btn-info">Cancelar</button>
             </div>
 </form>
