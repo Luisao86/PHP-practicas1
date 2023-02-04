@@ -17,13 +17,15 @@ switch ($accion) {
         $sentenciaSQL->bindParam(':nombre',$txtNombre);
 
         $fecha= new DateTime();
-        $nombreArchivo=($txtImagen!="")?$fecha->getTimestamp()."_".$_FILES['txtImagen']['nombre']:"imagen.jpg";
+        $nombreArchivo=($txtImagen!="")?$fecha->getTimestamp()."_".$_FILES["txtImagen"]["name"]:"imagen.jpg";
 
-        $tmpimagen=$_FILES["txtImagen"]["tmp_imagen"];
+        $tmpImagen=$_FILES["txtImagen"]["tmp_name"];   
 
-        if($tmpimagen)
+        if($tmpImagen!=""){
+            move_uploaded_file($tmpImagen,"../../img/".$nombreArchivo);
+        }
 
-        $sentenciaSQL->bindParam(':imagen',$txtImagen);
+        $sentenciaSQL->bindParam(':imagen',$nombreArchivo);
         $sentenciaSQL->execute();
         break;
 
@@ -35,9 +37,32 @@ switch ($accion) {
         $sentenciaSQL->execute();
 
         if($txtImagen!=""){ 
+
+            //Seleccion de archivo
+            $fecha= new DateTime();
+            $nombreArchivo=($txtImagen!="")?$fecha->getTimestamp()."_".$_FILES["txtImagen"]["name"]:"imagen.jpg";
+            $tmpImagen=$_FILES["txtImagen"]["tmp_name"];   
             
+            //copia y pega archivo
+            move_uploaded_file($tmpImagen,"../../img/".$nombreArchivo);
+            
+            //borra imagen anterior
+            $sentenciaSQL= $conexion->prepare("SELECT imagen FROM productos WHERE ID=:ID");
+            $sentenciaSQL->bindParam(':ID',$txtid);
+            $sentenciaSQL->execute();
+            $producto=$sentenciaSQL->fetch(PDO::FETCH_LAZY);
+
+                if(isset($producto["imagen"])&&($producto["imagen"]!="imagen.jpg") ){
+            
+                    if(file_exists("../../img/".$producto["imagen"])){
+
+                        unlink("../../img/".$producto["imagen"]);
+                    }
+                }
+
+
             $sentenciaSQL= $conexion->prepare("UPDATE productos SET imagen=:imagen WHERE ID=:ID");
-            $sentenciaSQL->bindParam(':imagen',$txtImagen);
+            $sentenciaSQL->bindParam(':imagen',$nombreArchivo);
             $sentenciaSQL->bindParam(':ID',$txtid);
             $sentenciaSQL->execute();
         }
@@ -58,12 +83,24 @@ switch ($accion) {
         $txtNombre=$producto['nombre'];
         $txtImagen=$producto['imagen'];
 
-
-        //echo "Presionado boton Seleccionar";
         break;
 
     case 'Borrar':
-       // echo "Presionado boton Borrar";
+
+        $sentenciaSQL= $conexion->prepare("SELECT imagen FROM productos WHERE ID=:ID");
+        $sentenciaSQL->bindParam(':ID',$txtid);
+        $sentenciaSQL->execute();
+        $producto=$sentenciaSQL->fetch(PDO::FETCH_LAZY);
+
+        if(isset($producto["imagen"])&&($producto["imagen"]!="imagen.jpg") ){
+            
+            if(file_exists("../../img/".$producto["imagen"])){
+
+                unlink("../../img/".$producto["imagen"]);
+            }
+        }
+
+
         $sentenciaSQL= $conexion->prepare("DELETE FROM productos WHERE ID=:ID");
         $sentenciaSQL->bindParam(':ID',$txtid);
         $sentenciaSQL->execute();
@@ -98,7 +135,15 @@ switch ($accion) {
 
             <div class = "form-group">
                 <label for="exampleInputEmail1">Imagen:</label>
-                <?php echo $txtImagen;?>"
+                
+                <br/>
+
+                <?php if($txtImagen!=""){ ?>
+
+                    <img  class="img-thumbnail rounded"  src="../../img/<?php echo $txtImagen;?>" width="50px" alt="" srcset="">
+
+                <?php } ?>
+                
                 <input type="file" name="txtImagen" id="txtImagen" placeholder="Imagen">
             </div>
 
@@ -132,7 +177,9 @@ switch ($accion) {
             <tr>
                 <td><?php echo $producto['ID']?></td>
                 <td><?php echo $producto['nombre']?></td>
-                <td><?php echo $producto['imagen']?></td>
+                <td>
+                    <img class="img-thumbnail rounded" src="../../img/<?php echo $producto['imagen']?>" width="50px" alt="" srcset="">
+                </td>
                 
                 <td>
                     
