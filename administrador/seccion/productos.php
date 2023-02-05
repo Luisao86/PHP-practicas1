@@ -27,6 +27,9 @@ switch ($accion) {
 
         $sentenciaSQL->bindParam(':imagen',$nombreArchivo);
         $sentenciaSQL->execute();
+
+        header ("Location:productos.php");
+
         break;
 
     case 'Modificar':
@@ -66,11 +69,13 @@ switch ($accion) {
             $sentenciaSQL->bindParam(':ID',$txtid);
             $sentenciaSQL->execute();
         }
+        
+        header ("Location:productos.php");
 
         break;
 
     case 'Cancelar':
-        echo "Presionado boton cancelar";
+        header ("Location:productos.php");
         break;
 
     case 'Seleccionar':
@@ -104,6 +109,10 @@ switch ($accion) {
         $sentenciaSQL= $conexion->prepare("DELETE FROM productos WHERE ID=:ID");
         $sentenciaSQL->bindParam(':ID',$txtid);
         $sentenciaSQL->execute();
+
+        header ("Location:productos.php");
+
+
         break;
 }
 
@@ -130,7 +139,7 @@ switch ($accion) {
 
             <div class = "form-group">
                 <label for="exampleInputEmail1">Nombre:</label>
-                <input type="text" class="form-control" value="<?php echo $txtNombre;?>" name="txtNombre" id="txtNombre" placeholder="Nombre del producto">
+                <input type="text" required class="form-control" value="<?php echo $txtNombre;?>" name="txtNombre" id="txtNombre" placeholder="Nombre del producto">
             </div>
 
             <div class = "form-group">
@@ -148,9 +157,9 @@ switch ($accion) {
             </div>
 
             <div class="btn-group" role="group" aria-label="">
-                <button type="submit" name="accion" value="Agregar" class="btn btn-success">Agregar</button>
-                <button type="submit" name="accion" value="Modificar" class="btn btn-warning">Modificar</button>
-                <button type="submit" name="accion" value="Cancelar" class="btn btn-info">Cancelar</button>
+                <button type="submit" <?php echo($accion)=="Seleccionar"?"disabled":""; ?> name="accion" value="Agregar" class="btn btn-success">Agregar</button>
+                <button type="submit" <?php echo($accion)!="Seleccionar"?"disabled":""; ?> name="accion" value="Modificar" class="btn btn-warning">Modificar</button>
+                <button type="submit" <?php echo($accion)!="Seleccionar"?"disabled":""; ?> name="accion" value="Cancelar" class="btn btn-info">Cancelar</button>
             </div>
 </form>
         </div>

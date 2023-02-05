@@ -1,7 +1,18 @@
 <?php
+session_start();
 if($_POST){
-    header('Location:inicio.php');
+    if(($_POST['usuario']=="luis")&&($_POST['contrasenia']=="miclave")){
+
+        $_SESSION['usuario']="ok";
+        $_SESSION['nombreUsuario']="luis";
+       
+        header('Location:inicio.php');
+    
+    }else{
+        $mensaje="Error: el nombre o contraseña son incorrectos";
+    }
 }
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -34,14 +45,14 @@ if($_POST){
                             </div>
                             
                             <div class="card-body">
-                                
+                              
                                 <form method="POST">
                                 
                                     <div class = "form-group">
                                 
                                         <label for="exampleInputEmail1">Usuario</label>
                                 
-                                        <input type="text" class="form-control" name="usuario" placeholder="Email">
+                                        <input type="text" class="form-control" name="usuario" placeholder="Usuario">
                                 
                                         <small id="emailHelp" class="form-text text-muted">Nunca compartiremos su correo electrónico con nadie más.</small>
                                     </div>
@@ -51,9 +62,14 @@ if($_POST){
                                         <label for="exampleInputPassword1">Contraseña:</label>
                                 
                                         <input type="password" class="form-control" 
-                                        name="contraseña" placeholder="Contraseña">
+                                        name="contrasenia" placeholder="Contraseña">
                                 
                                     </div>
+                            <?php if(isset($mensaje)) { ?>
+                                <div class="alert alert-danger" role="alert">
+                                    <?php echo $mensaje; ?>
+                                </div>
+                            <?php } ?>
                                 
                                     <button type="submit" class="btn btn-primary">Acceder
 
